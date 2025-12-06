@@ -1,0 +1,7 @@
+{
+  "name": "Dyslexia Lens",
+  "description": "An assistive tool that uses AI to extract, simplify, and format text from documents for easier reading.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
