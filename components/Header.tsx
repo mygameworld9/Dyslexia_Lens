@@ -1,6 +1,6 @@
 import React from 'react';
 import { ModelType, AppSettings } from '../types';
-import { Eye, Type as TypeIcon, Plus } from 'lucide-react';
+import { Eye, Type as TypeIcon, Plus, MoveHorizontal, RotateCw } from 'lucide-react';
 
 interface HeaderProps {
   model: ModelType;
@@ -19,11 +19,22 @@ export const Header: React.FC<HeaderProps> = ({ model, setModel, settings, setSe
     }));
   };
 
-  const increaseFontSize = () => {
+  const toggleSpacing = () => {
     setSettings(prev => ({
       ...prev,
-      fontSize: Math.min(prev.fontSize + 2, 32) // Max size cap
+      wordSpacing: prev.wordSpacing === 'normal' ? 'wide' : 'normal'
     }));
+  };
+
+  const cycleFontSize = () => {
+    setSettings(prev => {
+      // Cycle: 16 -> 20 -> 24 -> 28 -> 16
+      const nextSize = prev.fontSize + 4;
+      return {
+        ...prev,
+        fontSize: nextSize > 28 ? 16 : nextSize
+      };
+    });
   };
 
   return (
@@ -43,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ model, setModel, settings, setSe
 
       <div className="flex items-center gap-4">
         {/* Model Toggle */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200">
+        <div className="flex items-center bg-slate-100 p-1 rounded-full border border-slate-200 hidden md:flex">
           <button
             onClick={() => setModel(ModelType.FLASH)}
             className={`px-3 py-1 text-sm font-medium rounded-full transition-all duration-200 ${
@@ -66,29 +77,50 @@ export const Header: React.FC<HeaderProps> = ({ model, setModel, settings, setSe
           </button>
         </div>
 
-        <div className="h-6 w-px bg-slate-200 mx-1"></div>
+        <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block"></div>
 
         {/* Accessibility Controls */}
-        <button 
-          onClick={toggleFont}
-          className={`p-2 rounded-lg transition-colors border ${
-            settings.isDyslexiaFont 
-              ? 'bg-primary-50 border-primary-200 text-primary-700' 
-              : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-          }`}
-          title="Toggle Dyslexia Friendly Font"
-        >
-          <TypeIcon size={18} />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={toggleFont}
+            className={`p-2 rounded-lg transition-colors border ${
+              settings.isDyslexiaFont 
+                ? 'bg-primary-50 border-primary-200 text-primary-700' 
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+            title="Toggle Dyslexia Friendly Font"
+            aria-label="Toggle Dyslexia Friendly Font"
+          >
+            <TypeIcon size={18} />
+          </button>
 
-        <button 
-          onClick={increaseFontSize}
-          className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-0.5"
-          title="Increase Text Size"
-        >
-          <TypeIcon size={14} />
-          <Plus size={10} strokeWidth={3} />
-        </button>
+          <button 
+            onClick={toggleSpacing}
+            className={`p-2 rounded-lg transition-colors border ${
+              settings.wordSpacing === 'wide'
+                ? 'bg-primary-50 border-primary-200 text-primary-700' 
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
+            title="Toggle Word Spacing"
+            aria-label="Toggle Word Spacing"
+          >
+            <MoveHorizontal size={18} />
+          </button>
+
+          <button 
+            onClick={cycleFontSize}
+            className="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-1 min-w-[3rem] justify-center"
+            title="Change Text Size"
+            aria-label="Change Text Size"
+          >
+            <span className="text-xs font-bold text-slate-400">{settings.fontSize}px</span>
+            {settings.fontSize >= 28 ? (
+              <RotateCw size={14} />
+            ) : (
+               <Plus size={14} strokeWidth={3} />
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );
